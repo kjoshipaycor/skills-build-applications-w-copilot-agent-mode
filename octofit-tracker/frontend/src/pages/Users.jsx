@@ -2,12 +2,13 @@ import { useState, useEffect } from 'react';
 import { API_BASE } from '../api/config';
 
 const FITNESS_LEVELS = ['beginner', 'intermediate', 'advanced'];
+const ROLES = ['student', 'teacher'];
 
 export default function Users() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [form, setForm] = useState({ username: '', email: '', password: '', age: '', fitnessLevel: 'beginner' });
+  const [form, setForm] = useState({ username: '', email: '', password: '', age: '', fitnessLevel: 'beginner', role: 'student' });
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState('');
 
@@ -41,7 +42,7 @@ export default function Users() {
         setFormError(err.message || 'Failed to create user');
         return;
       }
-      setForm({ username: '', email: '', password: '', age: '', fitnessLevel: 'beginner' });
+      setForm({ username: '', email: '', password: '', age: '', fitnessLevel: 'beginner', role: 'student' });
       fetchUsers();
     } catch {
       setFormError('Network error');
@@ -87,6 +88,12 @@ export default function Users() {
                 {FITNESS_LEVELS.map(l => <option key={l}>{l}</option>)}
               </select>
             </div>
+            <div className="col-md-2">
+              <select className="form-select" value={form.role}
+                onChange={e => setForm({ ...form, role: e.target.value })}>
+                {ROLES.map(r => <option key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</option>)}
+              </select>
+            </div>
             <div className="col-12">
               <button className="btn btn-primary" type="submit" disabled={submitting}>
                 {submitting ? 'Saving…' : 'Add User'}
@@ -105,17 +112,18 @@ export default function Users() {
           <table className="table table-striped table-hover align-middle">
             <thead className="table-dark">
               <tr>
-                <th>Username</th><th>Email</th><th>Age</th><th>Fitness Level</th><th>Actions</th>
+                <th>Username</th><th>Email</th><th>Age</th><th>Role</th><th>Fitness Level</th><th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {users.length === 0 ? (
-                <tr><td colSpan={5} className="text-center text-muted">No users yet. Add one above!</td></tr>
+                <tr><td colSpan={6} className="text-center text-muted">No users yet. Add one above!</td></tr>
               ) : users.map(u => (
                 <tr key={u._id}>
                   <td><strong>{u.username}</strong></td>
                   <td>{u.email}</td>
                   <td>{u.age}</td>
+                  <td><span className={`badge bg-${u.role === 'teacher' ? 'info text-dark' : 'primary'}`}>{u.role ?? 'student'}</span></td>
                   <td><span className={`badge bg-${u.fitnessLevel === 'advanced' ? 'danger' : u.fitnessLevel === 'intermediate' ? 'warning text-dark' : 'success'}`}>{u.fitnessLevel}</span></td>
                   <td>
                     <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(u._id)}>Delete</button>
