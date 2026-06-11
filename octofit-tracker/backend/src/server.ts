@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
+import rateLimit from 'express-rate-limit';
 
 import usersRouter from './routes/users';
 import teamsRouter from './routes/teams';
@@ -12,6 +13,16 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+// Apply rate limiting to all API routes
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 200,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: 'Too many requests, please try again later.' },
+});
+app.use('/api/', apiLimiter);
 
 // Routes
 app.use('/api/users', usersRouter);

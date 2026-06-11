@@ -1,7 +1,12 @@
 import { Router, Request, Response } from 'express';
+import mongoose from 'mongoose';
 import User from '../models/User';
 
 const router = Router();
+
+function isValidObjectId(id: string): boolean {
+  return mongoose.Types.ObjectId.isValid(id) && String(new mongoose.Types.ObjectId(id)) === id;
+}
 
 // GET all users
 router.get('/', async (_req: Request, res: Response) => {
@@ -41,6 +46,7 @@ router.post('/', async (req: Request, res: Response) => {
 
 // PUT update user
 router.put('/:id', async (req: Request, res: Response) => {
+  if (!isValidObjectId(req.params.id)) return res.status(400).json({ message: 'Invalid user ID' });
   try {
     const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true }).select('-password');
     if (!user) return res.status(404).json({ message: 'User not found' });
