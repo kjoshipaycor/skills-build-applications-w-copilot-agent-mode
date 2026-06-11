@@ -31,3 +31,7 @@ yarn-error.log*
 # Python files
 *.pyc
 __pycache__/
+
+# OctoFit Tracker build artifacts
+octofit-tracker/frontend/dist
+octofit-tracker/backend/dist
